@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="tabs" role="tablist" aria-label="Herramientas">
+  <button class="tab active" type="button" data-tab="frames" role="tab" aria-selected="true">
+    Capturas de vídeo
+  </button>
+  <button class="tab" type="button" data-tab="transcribe" role="tab" aria-selected="false">
+    Transcripción de audio
+  </button>
+</section>
+
+<section class="panel active" id="panel-frames" role="tabpanel">
+  <form class="card" id="frames-form" data-kind="frames" data-endpoint="/api/frames">
+    <h2>Extraer capturas</h2>
+    <p class="hint">
+      Genera una imagen cada N segundos, un índice CSV y un ZIP con todo el resultado.
+    </p>
+
+    <label class="dropzone" data-dropzone>
+      <input type="file" name="file" accept="video/*,.mkv,.mov,.avi,.webm,.mp4" required />
+      <strong>Arrastra un vídeo aquí o haz clic para elegirlo</strong>
+      <span class="file-name">Ningún archivo seleccionado</span>
+    </label>
+
+    <div class="grid">
+      <label>
+        Intervalo (segundos)
+        <input type="number" name="intervalo" min="0.001" step="0.5"
+               value="{{ defaults.intervalo }}" required />
+      </label>
+      <label>
+        Calidad JPEG (1 mejor, 31 peor)
+        <input type="number" name="calidad" min="1" max="31" value="{{ defaults.calidad }}" required />
+      </label>
+      <label>
+        Número inicial
+        <input type="number" name="inicio" min="0" value="0" required />
+      </label>
+    </div>
+
+    <button class="primary" type="submit">Extraer capturas</button>
+  </form>
+
+  <div class="card job" id="frames-job" hidden>
+    <div class="job-header">
+      <h2>Progreso</h2>
+      <button class="ghost" type="button" data-action="delete">Descartar</button>
+    </div>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <p class="status">En cola</p>
+    <p class="error" hidden></p>
+    <div class="result" hidden></div>
+  </div>
+</section>
+
+<section class="panel" id="panel-transcribe" role="tabpanel">
+  <form class="card" id="transcribe-form" data-kind="transcribe" data-endpoint="/api/transcribe">
+    <h2>Transcribir audio</h2>
+    <p class="hint">
+      Usa faster-whisper para generar un TXT y un SRT con subtítulos.
+    </p>
+
+    <label class="dropzone" data-dropzone>
+      <input type="file" name="file" accept="audio/*,video/*,.wav,.mp3,.m4a,.ogg,.flac,.mp4,.mkv"
+             required />
+      <strong>Arrastra un audio o vídeo aquí o haz clic para elegirlo</strong>
+      <span class="file-name">Ningún archivo seleccionado</span>
+    </label>
+
+    <div class="grid">
+      <label>
+        Modelo
+        <select name="modelo">
+          {% for model in models %}
+          <option value="{{ model }}" {% if model == defaults.modelo %}selected{% endif %}>
+            {{ model }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Dispositivo
+        <select name="dispositivo">
+          {% for device in devices %}
+          <option value="{{ device }}" {% if device == defaults.dispositivo %}selected{% endif %}>
+            {{ device }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Tipo de cálculo
+        <select name="tipo_calculo">
+          {% for compute in compute_types %}
+          <option value="{{ compute }}"
+                  {% if compute == defaults.tipo_calculo %}selected{% endif %}>
+            {{ compute }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Idioma
+        <input type="text" name="idioma" value="{{ defaults.idioma }}"
+               placeholder="es, en, auto..." />
+      </label>
+      <label>
+        Beam size
+        <input type="number" name="beam_size" min="1" value="{{ defaults.beam_size }}" required />
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" name="sin_vad" />
+        Desactivar filtro VAD
+      </label>
+    </div>
+
+    <label class="wide">
+      Contexto para el modelo (opcional)
+      <textarea name="contexto" rows="4"
+                placeholder="Vacío usa el contexto técnico por defecto. Escribe términos, nombres o siglas que deba reconocer."></textarea>
+    </label>
+
+    <button class="primary" type="submit">Transcribir</button>
+  </form>
+
+  <div class="card job" id="transcribe-job" hidden>
+    <div class="job-header">
+      <h2>Progreso</h2>
+      <button class="ghost" type="button" data-action="delete">Descartar</button>
+    </div>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <p class="status">En cola</p>
+    <p class="error" hidden></p>
+    <div class="result" hidden></div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}media-tools{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">MT</span>
+        <div>
+          <h1>media-tools</h1>
+          <p>Capturas de vídeo y transcripción de audio, en tu equipo.</p>
+        </div>
+      </div>
+    </header>
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer>
+      Servidor local <span class="dot"></span>
+      <span id="server-status">conectado</span>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
